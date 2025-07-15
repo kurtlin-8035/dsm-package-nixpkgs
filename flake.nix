@@ -19,6 +19,6 @@
             system = "x86_64-linux";
             overlays = [self.overlays.default];
           };
-        in pkgs;
+        in pkgs.SynologyPackageALaCarte;
     };
 }
