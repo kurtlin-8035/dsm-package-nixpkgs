@@ -171,33 +171,53 @@ final: prev: {
       ) { }
     );
   };
-  SynologyPackageALaCarte = final.lib.mergeAttrsList (
-    final.lib.forEach [ "DSM7-2" ] (name: {
-      ${name} = builtins.mapAttrs (
-        k: v:
-        if final.lib.isDerivation (final."${k}") then
-          let
-            drv = final."${k}";
-          in
-          final.buildSynologyBinaryPackage.${name} {
-            inherit (drv) pname version;
-            drvs = [ drv ];
-            description = final.lib.attrByPath [
-              "meta"
-              "description"
-            ] null drv;
-            maintainer = final.lib.attrByPath [
-              "meta"
-              "homepage"
-            ] null drv;
-            maintainerUrl = final.lib.attrByPath [
-              "meta"
-              "homepage"
-            ] null drv;
-          }
-        else
-          v
-      ) final;
-    })
+  SynologyPackageALaCarte = (
+    final.lib.mergeAttrsList (
+      final.lib.forEach [ "DSM7-2" ] (name: {
+        ${name} = builtins.mapAttrs (
+          k: v:
+          if final.lib.isDerivation (final."${k}") then
+            let
+              drv = final."${k}";
+            in
+            final.buildSynologyBinaryPackage.${name} {
+              inherit (drv) pname version;
+              drvs = [ drv ];
+              description = final.lib.attrByPath [
+                "meta"
+                "description"
+              ] null drv;
+              maintainer = final.lib.attrByPath [
+                "meta"
+                "homepage"
+              ] null drv;
+              maintainerUrl = final.lib.attrByPath [
+                "meta"
+                "homepage"
+              ] null drv;
+            }
+          else
+            v
+        ) final;
+      })
+    )
+    // {
+      DSM7-2.toolbox = final.buildSynologyBinaryPackage.DSM7-2 {
+        pname = "toolbox";
+        version = "0.0.1";
+        drvs = with final; [
+          # 放你喜歡的東西進來
+          strace
+          nethogs
+          gdb
+        ];
+        description = "toolbox test package";
+        maintainer = "kurtlin";
+        maintainerUrl = "YOUR URL";
+      };
+    }
   );
 }
+
+# build command:
+# nix build '.#DSM7-2.toolbox' --extra-experimental-features "nix-command flakes"
